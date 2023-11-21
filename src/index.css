@@ -8,7 +8,14 @@ html, body {
     height: 100vh;
 }
 
+body {
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 canvas {
-    width: 100vw;
+    width: auto;
     height: 100vh;
 }

@@ -8,15 +8,15 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xA9FFFF);
-const camera = new THREE.PerspectiveCamera(90, window.innerWidth/window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, 1920/1080, 0.1, 1000);
 camera.position.set(2,0,2);
 camera.lookAt(0,0,0);
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight, false);
+const renderer = new THREE.WebGLRenderer({alpha: true,antialias: true});
+renderer.setSize( 1600, 900, false);
 document.body.appendChild( renderer.domElement );
 
-const light = new THREE.AmbientLight( 0xF0F0F0 ); // soft white light
-light.position.set(10,10,10);
+const light = new THREE.AmbientLight( 0xFFFFFF ); // soft white light
+light.position.set(10,100,10);
 scene.add( light );
 
 const axesHelper = new THREE.AxesHelper( 5 );
@@ -40,7 +40,7 @@ loader.load( './blender/player.glb', function ( gltf ) {
     console.error( error );
 } );
 
-const playerObj = {dir:{theta:0,delta:0},pos:{x:0,y:0.33,z:0},keys:{W:false,A:false,S:false,D:false}};
+const playerObj = {dir:{theta:0,delta:0},pos:{x:0,y:0.33,z:0},keys:{W:false,A:false,S:false,D:false,shift:false}};
 
 const playerId = generateUUID();
 
@@ -89,6 +89,9 @@ window.addEventListener('keydown', (e) => {
     if (e.code === "KeyD") {
         playerObj.keys.D = true;
     }
+    if (e.code === "ShiftLeft") {
+        playerObj.keys.shift = true;
+    }
 });
 
 window.addEventListener('keyup', (e) => {
@@ -104,6 +107,9 @@ window.addEventListener('keyup', (e) => {
     if (e.code === "KeyD") {
         playerObj.keys.D = false;
     }
+    if (e.code === "ShiftLeft") {
+        playerObj.keys.shift = false;
+    }
 });
 
 function getVecFromKeys () {
@@ -111,6 +117,7 @@ function getVecFromKeys () {
     const backVector = new THREE.Vector3(0,0,1);
     const forwardVector = new THREE.Vector3(0,0,-1);
     const leftVector = new THREE.Vector3(-1,0,0);
+    let scalar = 1;
 
     let initial = new THREE.Vector3(0,0,0);
     if (playerObj.keys.W === true) {
@@ -125,9 +132,13 @@ function getVecFromKeys () {
     if (playerObj.keys.D === true) {
         initial = initial.add(rightVector);
     }
+    if (playerObj.keys.shift === true) {
+        scalar = 1.66;
+    }
 
-    return initial.applyEuler(new THREE.Euler(0,playerObj.dir.theta,0));
+    return initial.applyEuler(new THREE.Euler(0,playerObj.dir.theta,0)).multiplyScalar(scalar);
 }
+
 //Initial data fetching
 
 const initialServerData = initFetch();
@@ -150,7 +161,7 @@ function gameFrame () {
 
         cameraEuler.set(playerObj.dir.delta,playerObj.dir.theta,0,'ZYX');
         camera.setRotationFromEuler(cameraEuler);
-        const cameraOffset = new THREE.Vector3(2/3,7/12,1);
+        const cameraOffset = new THREE.Vector3(2/3,1/2,4/3);
         const rotatedCameraOffset = cameraOffset.applyEuler(cameraEuler);
 
         camera.position.set(playerObj.pos.x+rotatedCameraOffset.x,
