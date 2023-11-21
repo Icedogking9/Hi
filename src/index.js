@@ -4,6 +4,16 @@ import { generateUUID } from 'three/src/math/MathUtils';
 import { initFetch } from './comm.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+/*
+    SCALE ALL MODELS BY 1/5 EXCEPT FOR PLAYER MODEL!!!
+    SCALE ALL MODELS BY 1/5 EXCEPT FOR PLAYER MODEL!!!
+    SCALE ALL MODELS BY 1/5 EXCEPT FOR PLAYER MODEL!!!
+    SCALE ALL MODELS BY 1/5 EXCEPT FOR PLAYER MODEL!!!
+    SCALE ALL MODELS BY 1/5 EXCEPT FOR PLAYER MODEL!!!
+    SCALE ALL MODELS BY 1/5 EXCEPT FOR PLAYER MODEL!!!
+    SCALE ALL MODELS BY 1/5 EXCEPT FOR PLAYER MODEL!!!
+*/
+
 // basic scene set up
 
 const scene = new THREE.Scene();
@@ -49,20 +59,26 @@ const playerId = generateUUID();
 let mouseToggle = false;
 let initX;
 let initY;
-window.addEventListener('mousedown', (e) => {
-    if (mouseToggle === false) {
-        initX = e.clientX;
-        initY = e.clientY;
-        mouseToggle = true;
+window.addEventListener('keydown', (e) => {
+    if (e.code === "Escape") {
+        if (mouseToggle === false) {
+            mouseToggle = true;
+        } else {
+            mouseToggle = false;
+        }
     }
 });
 
-window.addEventListener('mouseup', (e) => {
-    mouseToggle = false;
-});
-
 window.addEventListener('mousemove',(e) => {
+    if (mouseToggle === false) {
+            initX = e.clientX;
+            initY = e.clientY;
+    }
     if (mouseToggle === true) {
+        if (!(initX || initY)) {
+            initX = e.clientX;
+            initY = e.clientY;
+        }
         const deltaX = (e.clientX - initX)/window.innerWidth;
         const deltaY = (e.clientY - initY)/window.innerHeight;
 
