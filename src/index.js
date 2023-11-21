@@ -42,10 +42,44 @@ loader.load( './blender/player.glb', function ( gltf ) {
 
 const playerObj = {dir:{theta:0,delta:0},pos:{x:0,y:0,z:0}};
 
-
 const playerId = generateUUID();
 
+//Event listeners
+
+let mouseToggle = false;
+let initX;
+let initY;
+window.addEventListener('mousedown', (e) => {
+    if (mouseToggle === false) {
+        initX = e.clientX;
+        initY = e.clientY;
+        mouseToggle = true;
+    }
+});
+
+window.addEventListener('mouseup', (e) => {
+    mouseToggle = false;
+});
+
+window.addEventListener('mousemove',(e) => {
+    if (mouseToggle === true) {
+        const deltaX = (e.clientX - initX)/window.innerWidth;
+        const deltaY = (e.clientY - initY)/window.innerHeight;
+
+        playerObj.dir.theta -= Math.PI*deltaX;
+        if ((Math.abs(playerObj.dir.delta) < (9*Math.PI)/20)||(playerObj.dir.delta <= -(9*Math.PI)/20 && deltaY < 0)||(playerObj.dir.delta >= (9*Math.PI)/20 && deltaY > 0)) {
+            playerObj.dir.delta -= (Math.PI/2)*deltaY;
+        }
+
+        initX = e.clientX;
+        initY = e.clientY;
+    }
+});
+//Initial data fetching
+
 const initialServerData = initFetch();
+
+// Game Loop Things
 
 const modelEuler = new THREE.Euler(0,0,0);
 const cameraEuler = new THREE.Euler(0,0,0);
